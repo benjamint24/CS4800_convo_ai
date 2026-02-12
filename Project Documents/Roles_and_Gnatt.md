@@ -136,13 +136,13 @@ Sprint 3: Evaluation & Demo
 
 Frontend Timeline
 
-![Frontend](Project-Documents/Frontend.png)
+![Frontend](image/Frontend.png)
 
 
 Backend Timeline
 
-![Backend](Project-Documents/Backend.png)
+![Backend](image/Backend.png)
 
 AI Integration Timeline
 
-![AI](Project-Documents/AI-Integration-Specialist.png)
+![AI](image/AI%20Integration%20Specialist.png)
