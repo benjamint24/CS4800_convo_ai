@@ -58,18 +58,22 @@ http://localhost:5173/
 
 OPTION B — DOCKER (IF NODE VERSION CONFLICTS OCCUR)
 
-If you encounter Node version or engine errors, use Docker.
+If you encounter Node version or engine errors locally, use Docker.
 
 Prerequisite:
 Docker Desktop installed and running.
+
+--------------------------------------------------
+
+INITIAL SETUP (First Time Only)
 
 1. Remove any existing frontend folder:
 
 rm -rf frontend
 
-2. Start a clean Node 20 container:
+2. Start a clean Node 20 container WITH port mapping:
 
-docker run --rm -it -v "$PWD":/app -w /app node:20 bash
+docker run --rm -it -p 5173:5173 -v "$PWD":/app -w /app node:20 bash
 
 3. Inside the container:
 
@@ -81,27 +85,45 @@ Select:
 - Use Vite beta: No
 - Install dependencies: Yes
 
-4. Run development server inside container:
+4. Start the development server inside Docker:
 
 cd frontend
 npm run dev -- --host
 
-5. Exit container when finished:
+5. Open in your browser:
 
+http://localhost:5173
+
+6. When finished:
+
+CTRL + C
 exit
 
 --------------------------------------------------
 
 RUNNING THE FRONTEND AFTER INITIAL SETUP
 
-Local Node:
+Local Node (Recommended if working properly):
+
 cd frontend
 npm run dev
 
-Docker:
-docker run --rm -it -v "$PWD":/app -w /app node:20 bash
+Then open:
+http://localhost:5173
+
+--------------------------------------------------
+
+Docker (If Node conflicts occur):
+
+docker run --rm -it -p 5173:5173 -v "$PWD":/app -w /app node:20 bash
+
+Inside container:
+
 cd frontend
 npm run dev -- --host
+
+Then open:
+http://localhost:5173
 
 --------------------------------------------------
 
@@ -130,6 +152,11 @@ NOTES
 - The .nvmrc file ensures team-wide version alignment.
 - node_modules must never be committed (handled by .gitignore).
 - Docker is only required if local Node conflicts occur.
+- When using Docker, always include:
+  -p 5173:5173
+  and
+  npm run dev -- --host
+  or the site will not be accessible from your browser.
 
 --------------------------------------------------
 
