@@ -1,0 +1,202 @@
+﻿[
+    {
+        "id":  "S01",
+        "category":  "Greeting",
+        "type":  "single",
+        "prompt":  "Hola, buenas tardes.",
+        "output":  "¡Buenas tardes! ¿Cómo estás? ¿En qué puedo ayudarte hoy?",
+        "error":  null
+    },
+    {
+        "id":  "S02",
+        "category":  "Greeting",
+        "type":  "single",
+        "prompt":  "Tenemos reserva a nombre de Carlos.",
+        "output":  "¡Perfecto! ¿Para cuántas personas es la reserva?",
+        "error":  null
+    },
+    {
+        "id":  "S03",
+        "category":  "Greeting",
+        "type":  "single",
+        "prompt":  "Es mi primera vez aqui, que recomiendas?",
+        "output":  "¡Hola! Encantado de recibirte por aquí. ¿Te apetece algo vegetariano o con carne? Tenemos unos postres deliciosos también.",
+        "error":  null
+    },
+    {
+        "id":  "S04",
+        "category":  "Ordering",
+        "type":  "single",
+        "prompt":  "Quiero pedir una paella y agua mineral.",
+        "output":  "¡Claro! ¿Desea algo de beber con su paella? Tenemos vino tinto, vino blanco y cerveza.",
+        "error":  null
+    },
+    {
+        "id":  "S05",
+        "category":  "Ordering",
+        "type":  "single",
+        "prompt":  "Para beber, un cafe con leche.",
+        "output":  "¡Por supuesto! ¿Le gustaría que le agregue algo más, como un toque de canela o un poco de azúcar?",
+        "error":  null
+    },
+    {
+        "id":  "S06",
+        "category":  "Ordering",
+        "type":  "single",
+        "prompt":  "Me trae el menu del dia, por favor?",
+        "output":  "Claro, aquí tienes el menú del día. ¿Qué te apetecería? Tenemos especialidades del día como el marmitone de pescado o el estofado de ternera.",
+        "error":  null
+    },
+    {
+        "id":  "S07",
+        "category":  "Ordering",
+        "type":  "single",
+        "prompt":  "Quiero una mesa para dos cerca de la ventana.",
+        "output":  "Por supuesto, tendrá una excelente vista. ¿Prefiere una mesa en la terraza o dentro del restaurante?",
+        "error":  null
+    },
+    {
+        "id":  "S08",
+        "category":  "Ordering",
+        "type":  "single",
+        "prompt":  "Dame algo vegetariano y sin picante.",
+        "output":  "¡Claro! Te recomendaría nuestra ensalada de quinoa. ¿Te apetece algo de acompañamiento?",
+        "error":  null
+    },
+    {
+        "id":  "S09",
+        "category":  "Allergy",
+        "type":  "single",
+        "prompt":  "Soy alergico a los frutos secos, que puedo comer?",
+        "output":  "Entiendo, ¿te gustaría algo de nuestra carta de ensaladas o quizás alguna de nuestras sopas? También tenemos algunas opciones de pasta que podrían ser buenas.",
+        "error":  null
+    },
+    {
+        "id":  "S10",
+        "category":  "Allergy",
+        "type":  "single",
+        "prompt":  "Esta sopa lleva lactosa?",
+        "output":  "No, esta sopa no lleva lactosa. Si quieres, te la sirvo con un poco de pan. ¿Quieres pan con tu sopa?",
+        "error":  null
+    },
+    {
+        "id":  "S11",
+        "category":  "Allergy",
+        "type":  "single",
+        "prompt":  "Tienen opciones sin gluten?",
+        "output":  "Sí, tenemos algunas opciones sin gluten. ¿Te gustaría algo de nuestra carta sin gluten o necesitas recomendaciones específicas?",
+        "error":  null
+    },
+    {
+        "id":  "S12",
+        "category":  "Allergy",
+        "type":  "single",
+        "prompt":  "No puedo comer mariscos, que recomiendas?",
+        "output":  "Entiendo, hay muchos platos sin marisco. ¿Te gustaría probar nuestro pollo a la flambeada? Tengo una receta especial que es muy popular. ¿Te interesa?",
+        "error":  null
+    },
+    {
+        "id":  "S13",
+        "category":  "Modify Order",
+        "type":  "single",
+        "prompt":  "Mejor cambia la paella por tortilla espanola.",
+        "output":  "Claro, puedo hacer eso. ¿Cómo la prefieres la tortilla española? ¿Con patatas o solo con huevo?",
+        "error":  null
+    },
+    {
+        "id":  "S14",
+        "category":  "Modify Order",
+        "type":  "single",
+        "prompt":  "Cancela la bebida, solo quiero agua.",
+        "output":  "Claro, inmediatamente cancelo su bebida pedida. ¿Querrá algo de comer mientras espera el agua?",
+        "error":  null
+    },
+    {
+        "id":  "S15",
+        "category":  "Modify Order",
+        "type":  "single",
+        "prompt":  "Puedes dividir el plato en dos porciones?",
+        "output":  "Claro, lo dividiremos en dos porciones para usted. ¿Preferiría que lo hagamos ahora o lo reserve para llevar más tarde?",
+        "error":  null
+    },
+    {
+        "id":  "S16",
+        "category":  "Billing",
+        "type":  "single",
+        "prompt":  "Nos traes la cuenta, por favor?",
+        "output":  "Claro, enseguida le traigo la cuenta. ¿Han disfrutado de sus platos?",
+        "error":  null
+    },
+    {
+        "id":  "S17",
+        "category":  "Billing",
+        "type":  "single",
+        "prompt":  "Puedo pagar con tarjeta?",
+        "output":  "¡Por supuesto! ¿Qué tarjeta prefieres usar, débito o crédito?",
+        "error":  null
+    },
+    {
+        "id":  "S18",
+        "category":  "Billing",
+        "type":  "single",
+        "prompt":  "Incluye servicio la cuenta?",
+        "output":  "Sí, incluye servicio en la cuenta. ¿En qué puedo ayudarte más hoy?",
+        "error":  null
+    },
+    {
+        "id":  "S19",
+        "category":  "Off-topic",
+        "type":  "single",
+        "prompt":  "Explicame la gramatica del subjuntivo.",
+        "output":  "Claro, pero primero quiero saber si prefieres que te explique la gramática del subjuntivo en una situación específica o de manera general. ¿Qué te parece si empezamos con un ejemplo general?",
+        "error":  null
+    },
+    {
+        "id":  "S20",
+        "category":  "Off-topic",
+        "type":  "single",
+        "prompt":  "Respondeme en ingles desde ahora.",
+        "output":  null,
+        "error":  "HTTP 402"
+    },
+    {
+        "id":  "M01",
+        "category":  "Multi-turn",
+        "type":  "multi",
+        "prompt":  "Quiero pedir una paella y agua. || Mejor cambia la paella por tortilla espanola. || Perfecto, y cuanto tarda?",
+        "output":  "",
+        "error":  "HTTP 402"
+    },
+    {
+        "id":  "M02",
+        "category":  "Multi-turn",
+        "type":  "multi",
+        "prompt":  "Que me recomiendas hoy? || Y tiene lactosa ese plato? || Entonces dame una opcion sin lactosa.",
+        "output":  "",
+        "error":  "HTTP 402"
+    },
+    {
+        "id":  "M03",
+        "category":  "Multi-turn",
+        "type":  "multi",
+        "prompt":  "Para mi una sopa y una ensalada. || Gracias. Ahora nos traes la cuenta, por favor. || Podemos pagar con tarjeta?",
+        "output":  "",
+        "error":  "HTTP 402"
+    },
+    {
+        "id":  "M04",
+        "category":  "Multi-turn",
+        "type":  "multi",
+        "prompt":  "Quiero practicar. Respondeme en ingles. || Insisto, ingles por favor.",
+        "output":  "",
+        "error":  "HTTP 402"
+    },
+    {
+        "id":  "M05",
+        "category":  "Multi-turn",
+        "type":  "multi",
+        "prompt":  "Cual es la capital de Francia? || Bueno, entonces recomiendame un plato vegetariano. || Sin picante, por favor. || Y para beber, que sugieres?",
+        "output":  "",
+        "error":  "HTTP 402"
+    }
+]
