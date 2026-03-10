@@ -1,8 +1,8 @@
 {
   "setup": {
-    "date": "2026-03-10T01:02:49.325Z",
-    "baseUrl": "http://127.0.0.1:63505",
-    "email": "chatflow_1773104569318@example.com"
+    "date": "2026-03-10T01:16:24.882Z",
+    "baseUrl": "http://127.0.0.1:62162",
+    "email": "chatflow_1773105384880@example.com"
   },
   "auth": {
     "register": {
@@ -42,7 +42,7 @@
       "body": {
         "error": "CHAT_VALIDATION_ERROR",
         "message": "Field \"message\" is required",
-        "timestamp": "2026-03-10T01:02:49.561Z"
+        "timestamp": "2026-03-10T01:16:25.033Z"
       }
     },
     "invalidHistory": {
@@ -51,21 +51,21 @@
       "body": {
         "error": "CHAT_VALIDATION_ERROR",
         "message": "History item at index 0 must have role \"user\" or \"assistant\"",
-        "timestamp": "2026-03-10T01:02:49.566Z"
+        "timestamp": "2026-03-10T01:16:25.038Z"
       }
     },
     "successSingleTurn": {
       "status": 200,
       "ok": true,
       "body": {
-        "assistantMessage": "¡Excelente elección! La paella es uno de nuestros platos más populares. ¿Qué tipo de paella prefieres? Tenemos la valenciana, la marinera, la mixta... ¿O prefieres que te recomiende algo?",
+        "assistantMessage": "¡Genial! La paella es una de nuestras especialidades. ¿Qué tipo de paella prefieres? Tenemos la valenciana, la de mariscos o la vegetariana. ¿Te gustaría que te explique las opciones?",
         "model": "meta-llama/Meta-Llama-3-8B-Instruct",
         "usage": {
           "promptTokens": 2084,
-          "completionTokens": 47,
-          "totalTokens": 2131
+          "completionTokens": 46,
+          "totalTokens": 2130
         },
-        "timestamp": "2026-03-10T01:02:51.065Z",
+        "timestamp": "2026-03-10T01:16:26.675Z",
         "promptVersion": "1.0.0"
       }
     }
@@ -79,8 +79,8 @@
       "secondStatus": 200,
       "continuityHint": "veget",
       "continuityPass": true,
-      "turn1Preview": "¡Genial! La paella de mariscos es una de nuestras especialidades. ¿Quieres que te la haga con arroz de grano largo o corto?",
-      "turn2Preview": "¡Claro! La paella vegetariana es una excelente opción. ¿Quieres que la haga con verduras frescas y especias, o con setas y champiñones?"
+      "turn1Preview": "¡Genial! La paella de mariscos es una de nuestras especialidades. ¿Te gustaría que la preparemos con una variedad de mariscos frescos, como mejillones, calamare",
+      "turn2Preview": "No hay problema. En su lugar, puedo prepararte una paella vegetariana con verduras frescas y arroz. ¿Te gustaría que la haga con champiñones, pimientos y zanaho"
     },
     {
       "id": "F2-food-then-drink",
@@ -90,8 +90,8 @@
       "secondStatus": 200,
       "continuityHint": "beber",
       "continuityPass": false,
-      "turn1Preview": "¡Genial! Las tapas son una de las mejores cosas de España. ¿Qué tipo de tapas te gustaría? Tenemos patatas bravas, croquetas, tortilla española, pan con tomate.",
-      "turn2Preview": "Bueno, si te gusta un vino, te recomiendo un tinto de Rioja o un Albariño de Rías Baixas. Si prefieres algo más fresco, tenemos una deliciosa cerveza artesanal "
+      "turn1Preview": "¡Genial! Tenemos muchas opciones de tapas deliciosas. ¿Te gustan las clásicas como patatas bravas, croquetas o tortilla española?",
+      "turn2Preview": "Nuestra bebida más popular es la sangría. Es una mezcla de vino, frutas y hierbas que es perfecta para acompañar las tapas. También tenemos cerveza, agua y refr"
     },
     {
       "id": "F3-allergy-clarify",
@@ -100,9 +100,9 @@
       "firstStatus": 200,
       "secondStatus": 200,
       "continuityHint": "frutos secos",
-      "continuityPass": true,
-      "turn1Preview": "Entiendo. No te preocupes, tenemos algunas opciones sin frutos secos. ¿Te gustaría una ensalada de tomate fresco, o quizás una paella sin aceitunas ni almendras",
-      "turn2Preview": "¡Genial! Te recomiendo un pollo al ajillo, está hecho con pollo fresco y ajo, no tiene frutos secos ni salsa de nuez. ¿Quieres acompañarlo de patatas fritas o u"
+      "continuityPass": false,
+      "turn1Preview": "Tienes muchas opciones sin frutos secos. Nuestro plato del día es la paella valenciana, que no tiene frutos secos. También tenemos una deliciosa tortilla españo",
+      "turn2Preview": "Genial! Entiendo. Nuestra ensalada de atún es una buena opción, está hecha con atún fresco, tomate, cebolla y aceitunas. También tenemos una deliciosa sopa de v"
     },
     {
       "id": "F4-billing-close",
@@ -112,8 +112,8 @@
       "secondStatus": 200,
       "continuityHint": "cuenta",
       "continuityPass": true,
-      "turn1Preview": "Una excelente elección. ¿Quieres que te la preparemos con chorizo o solo con cebolla y patatas?",
-      "turn2Preview": "¡De acuerdo! Tu cuenta es: una tortilla española y un vaso de agua. ¿Quieres pagar con tarjeta o en efectivo?"
+      "turn1Preview": "Una tortilla española y agua, perfecto. ¿Quieres que te la haga con chorizo o sin?",
+      "turn2Preview": "Disculpa, pero todavía no te he traído la comida. ¿Quieres que te traiga primero la tortilla española y luego te traiga la cuenta?"
     },
     {
       "id": "F5-offtopic-redirect",
@@ -122,9 +122,9 @@
       "firstStatus": 200,
       "secondStatus": 200,
       "continuityHint": "orden",
-      "continuityPass": false,
-      "turn1Preview": "¡Genial! ¿Qué tipo de paella prefieres? ¿La clásica valenciana con pollo y mariscos, o una de carne con chorizo y morcilla?",
-      "turn2Preview": "Soy solo un camarero, estoy aquí para ayudarte con la comida. ¿Qué te gustaría acompañar a tu paella? Un vaso de vino, una cerveza o algo para beber?"
+      "continuityPass": true,
+      "turn1Preview": "¡Genial! La paella es una de nuestras especialidades. ¿Quieres la paella con mariscos, pollo, o vegetariana?",
+      "turn2Preview": "Soy solo un camarero, estoy aquí para ayudarte con la comida. ¿Qué te gustaría ordenar? ¿Quieres algo de beber mientras esperas tu paella?"
     }
   ],
   "regression": {
