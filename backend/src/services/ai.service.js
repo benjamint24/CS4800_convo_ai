@@ -15,6 +15,8 @@ const {
   AIConfigurationError
 } = require('../utils/ai-errors');
 
+const MAX_SYSTEM_PROMPT_LENGTH = 12000;
+
 /**
  * Validate system prompt
  * @private
@@ -33,11 +35,11 @@ function validateSystemPrompt(prompt) {
     });
   }
   
-  if (prompt.length > 4000) {
-    throw new AIValidationError('System prompt exceeds maximum length of 4000 characters', {
+  if (prompt.length > MAX_SYSTEM_PROMPT_LENGTH) {
+    throw new AIValidationError(`System prompt exceeds maximum length of ${MAX_SYSTEM_PROMPT_LENGTH} characters`, {
       field: 'systemPrompt',
       length: prompt.length,
-      maxLength: 4000
+      maxLength: MAX_SYSTEM_PROMPT_LENGTH
     });
   }
 }
@@ -172,10 +174,11 @@ function buildRequestPayload(systemPrompt, messages, config) {
 async function makeHuggingFaceRequest(payload) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), aiConfig.timeout.requestMs);
+  const encodedModelId = encodeURIComponent(aiConfig.model.id);
   
   try {
     const response = await fetchFn(
-      `${aiConfig.baseUrl}/${aiConfig.model.id}`,
+      `${aiConfig.baseUrl}/${encodedModelId}`,
       {
         method: 'POST',
         headers: {
@@ -212,11 +215,13 @@ async function makeHuggingFaceRequest(payload) {
  * @private
  */
 async function handleErrorResponse(response) {
+  const rawBody = await response.text();
   let errorBody;
+
   try {
-    errorBody = await response.json();
+    errorBody = rawBody ? JSON.parse(rawBody) : {};
   } catch {
-    errorBody = { error: await response.text() };
+    errorBody = { error: rawBody };
   }
   
   const statusCode = response.status;

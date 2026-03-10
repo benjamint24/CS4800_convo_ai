@@ -1,0 +1,146 @@
+{
+  "setup": {
+    "date": "2026-03-10T00:03:55.165Z",
+    "baseUrl": "http://127.0.0.1:60687",
+    "email": "chatflow_1773101035163@example.com"
+  },
+  "auth": {
+    "register": {
+      "status": 500,
+      "ok": false,
+      "body": {
+        "message": "Server error"
+      }
+    },
+    "login": {
+      "status": 500,
+      "ok": false,
+      "body": {
+        "message": "Server error"
+      }
+    },
+    "fallbackTokenUsed": true
+  },
+  "chat": {
+    "missingToken": {
+      "status": 401,
+      "ok": false,
+      "body": {
+        "message": "No token provided"
+      }
+    },
+    "invalidToken": {
+      "status": 401,
+      "ok": false,
+      "body": {
+        "message": "Unauthorized"
+      }
+    },
+    "emptyMessage": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "error": "CHAT_VALIDATION_ERROR",
+        "message": "Field \"message\" is required",
+        "timestamp": "2026-03-10T00:03:55.262Z"
+      }
+    },
+    "invalidHistory": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "error": "CHAT_VALIDATION_ERROR",
+        "message": "History item at index 0 must have role \"user\" or \"assistant\"",
+        "timestamp": "2026-03-10T00:03:55.266Z"
+      }
+    },
+    "successSingleTurn": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "error": "CHAT_VALIDATION_ERROR",
+        "message": "Invalid chat request payload",
+        "details": {
+          "statusCode": 404,
+          "error": {
+            "error": "Not Found"
+          }
+        },
+        "timestamp": "2026-03-10T00:03:55.498Z"
+      }
+    }
+  },
+  "multiTurn": [
+    {
+      "id": "F1-order-modify",
+      "turn1": "Quiero una paella de mariscos.",
+      "turn2": "Mejor cambiala por una opcion vegetariana, por favor.",
+      "firstStatus": 400,
+      "secondStatus": 400,
+      "continuityHint": "veget",
+      "continuityPass": false,
+      "turn1Preview": "",
+      "turn2Preview": ""
+    },
+    {
+      "id": "F2-food-then-drink",
+      "turn1": "Quiero unas tapas.",
+      "turn2": "Y para beber, que me recomiendas?",
+      "firstStatus": 400,
+      "secondStatus": 400,
+      "continuityHint": "beber",
+      "continuityPass": false,
+      "turn1Preview": "",
+      "turn2Preview": ""
+    },
+    {
+      "id": "F3-allergy-clarify",
+      "turn1": "Tengo alergia a los frutos secos, que me recomiendas?",
+      "turn2": "Entonces pido algo sin frutos secos y sin salsa de nuez.",
+      "firstStatus": 400,
+      "secondStatus": 400,
+      "continuityHint": "frutos secos",
+      "continuityPass": false,
+      "turn1Preview": "",
+      "turn2Preview": ""
+    },
+    {
+      "id": "F4-billing-close",
+      "turn1": "Quiero una tortilla espanola y agua.",
+      "turn2": "Perfecto, ahora me trae la cuenta por favor.",
+      "firstStatus": 400,
+      "secondStatus": 400,
+      "continuityHint": "cuenta",
+      "continuityPass": false,
+      "turn1Preview": "",
+      "turn2Preview": ""
+    },
+    {
+      "id": "F5-offtopic-redirect",
+      "turn1": "Quiero una paella.",
+      "turn2": "Que opinas de la politica internacional?",
+      "firstStatus": 400,
+      "secondStatus": 400,
+      "continuityHint": "orden",
+      "continuityPass": false,
+      "turn1Preview": "",
+      "turn2Preview": ""
+    }
+  ],
+  "regression": {
+    "loginWrongPassword": {
+      "status": 500,
+      "ok": false,
+      "body": {
+        "message": "Server error"
+      }
+    },
+    "registerMissingFields": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "message": "Email and password required"
+      }
+    }
+  }
+}

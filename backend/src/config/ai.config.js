@@ -16,7 +16,7 @@ const aiConfig = {
   apiKey: process.env.HUGGINGFACE_API_KEY,
   
   // Provider endpoints
-  baseUrl: 'https://api-inference.huggingface.co/models',
+  baseUrl: 'https://router.huggingface.co/hf-inference/models',
   
   // Model configuration
   model: {
