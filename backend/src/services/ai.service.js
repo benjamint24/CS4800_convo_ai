@@ -138,32 +138,15 @@ function estimateTokens(text) {
  * @private
  */
 function buildRequestPayload(systemPrompt, messages, config) {
-  // Format for Hugging Face conversational models
-  // Construct the full conversation including system message
-  const conversationParts = [`<s>[INST] ${systemPrompt}\n\n`];
-  
-  messages.forEach((msg, index) => {
-    if (msg.role === 'user') {
-      if (index === 0) {
-        conversationParts.push(`${msg.content} [/INST]`);
-      } else {
-        conversationParts.push(`<s>[INST] ${msg.content} [/INST]`);
-      }
-    } else if (msg.role === 'assistant') {
-      conversationParts.push(` ${msg.content}</s>`);
-    }
-  });
-  
-  const inputs = conversationParts.join('');
-  
   return {
-    inputs: inputs,
-    parameters: {
-      temperature: config.temperature ?? aiConfig.defaults.temperature,
-      max_new_tokens: config.maxTokens ?? aiConfig.defaults.maxTokens,
-      top_p: config.topP ?? aiConfig.defaults.topP,
-      return_full_text: false
-    }
+    model: aiConfig.model.id,
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...messages
+    ],
+    temperature: config.temperature ?? aiConfig.defaults.temperature,
+    max_tokens: config.maxTokens ?? aiConfig.defaults.maxTokens,
+    top_p: config.topP ?? aiConfig.defaults.topP
   };
 }
 
@@ -174,11 +157,10 @@ function buildRequestPayload(systemPrompt, messages, config) {
 async function makeHuggingFaceRequest(payload) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), aiConfig.timeout.requestMs);
-  const encodedModelId = encodeURIComponent(aiConfig.model.id);
-  
+
   try {
     const response = await fetchFn(
-      `${aiConfig.baseUrl}/${encodedModelId}`,
+      aiConfig.baseUrl,   // ✅ DO NOT append model anymore
       {
         method: 'POST',
         headers: {
@@ -189,26 +171,28 @@ async function makeHuggingFaceRequest(payload) {
         signal: controller.signal
       }
     );
-    
+
     clearTimeout(timeoutId);
-    
+
     return response;
+
   } catch (error) {
     clearTimeout(timeoutId);
-    
+
     if (error.name === 'AbortError') {
       throw new AITimeoutError(
         `Request timed out after ${aiConfig.timeout.requestMs}ms`,
         { timeout: aiConfig.timeout.requestMs }
       );
     }
-    
+
     throw new AIProviderError(
       `Network error: ${error.message}`,
       { originalError: error.message }
     );
   }
 }
+
 
 /**
  * Map HTTP response to appropriate error
@@ -269,9 +253,9 @@ function normalizeResponse(rawResponse, systemPrompt, messages) {
   let generatedText = '';
   
   // Hugging Face can return array or single object
-  if (Array.isArray(rawResponse)) {
-    generatedText = rawResponse[0]?.generated_text || '';
-  } else if (rawResponse.generated_text) {
+  if (rawResponse.choices && rawResponse.choices.length > 0) {
+  generatedText = rawResponse.choices[0].message.content;
+} else if (rawResponse.generated_text) {
     generatedText = rawResponse.generated_text;
   } else if (typeof rawResponse === 'string') {
     generatedText = rawResponse;

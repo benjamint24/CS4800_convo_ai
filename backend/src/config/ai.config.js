@@ -16,11 +16,11 @@ const aiConfig = {
   apiKey: process.env.HUGGINGFACE_API_KEY,
   
   // Provider endpoints
-  baseUrl: 'https://router.huggingface.co/hf-inference/models',
+  baseUrl: 'https://router.huggingface.co/v1/chat/completions',
   
   // Model configuration
   model: {
-    id: process.env.AI_MODEL_ID || 'mistralai/Mistral-7B-Instruct-v0.2',
+    id: process.env.AI_MODEL_ID || 'meta-llama/Meta-Llama-3-8B-Instruct',
     contextWindow: 32768,
     maxOutputTokens: 1024
   },
