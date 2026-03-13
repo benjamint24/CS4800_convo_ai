@@ -1,26 +1,33 @@
 import { useState } from "react";
 
 function Chat() {
-  const [message, setMessage] = useState("");
-  const [response, setResponse] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const sendMessage = async () => {
+    if (!input.trim()) return;
+
     setError("");
-    setResponse("");
     setLoading(true);
 
-    try {
-      const token = localStorage.getItem("convoai_token");
+    const token = localStorage.getItem("convoai_token");
 
+    // Current conversation history BEFORE new message
+    const history = messages.slice(-8);
+
+    try {
       const res = await fetch("http://localhost:5050/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({
+          message: input,
+          history: history
+        }),
       });
 
       const data = await res.json();
@@ -29,7 +36,14 @@ function Chat() {
         throw new Error(data.message || "Request failed");
       }
 
-      setResponse(data.assistantMessage);
+      // Update conversation with user + assistant messages
+      setMessages([
+        ...messages,
+        { role: "user", content: input },
+        { role: "assistant", content: data.assistantMessage }
+      ]);
+
+      setInput("");
     } catch (err) {
       setError(err.message);
     }
@@ -41,10 +55,20 @@ function Chat() {
     <div style={{ padding: "20px" }}>
       <h2>AI Chat (Sprint 2 Demo)</h2>
 
+      {/* Conversation Display */}
+      <div style={{ marginBottom: 20 }}>
+        {messages.map((msg, index) => (
+          <p key={index}>
+            <strong>{msg.role}:</strong> {msg.content}
+          </p>
+        ))}
+      </div>
+
+      {/* Input */}
       <input
         type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
         placeholder="Escribe un mensaje en español..."
         style={{ width: "300px", marginRight: "10px" }}
       />
@@ -54,13 +78,6 @@ function Chat() {
       </button>
 
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
-
-      {response && (
-        <div style={{ marginTop: "20px" }}>
-          <strong>AI Response:</strong>
-          <p>{response}</p>
-        </div>
-      )}
     </div>
   );
 }
