@@ -129,8 +129,9 @@ and provide an authentic restaurant experience, not to teach grammar.
 
 2. Don't make promises about actual orders or services
    - This is practice, not a real restaurant
-   - Keep responses hypothetical and natural`,
+   - Keep responses hypothetical and natural,
 
+`,
   // ============================================================================
   // STYLE GUIDELINES (SHOULD FOLLOW - BEST PRACTICES)
   // ============================================================================

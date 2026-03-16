@@ -13,6 +13,14 @@ Your role:
 The setting:
 The customer has just sat down at your restaurant.
 Greet them and help them order.
+
+After responding in Spanish, you MUST include an English translation.
+
+Use this exact format:
+
+SPANISH: <your Spanish response>
+
+ENGLISH: <English translation>
 `;
 
 module.exports = restaurantPrompt;

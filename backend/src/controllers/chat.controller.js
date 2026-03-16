@@ -164,8 +164,39 @@ exports.createConversationReply = async (req, res) => {
       ]
     });
 
+    // Generate English translation separately
+    const translationResult = await sendChatRequest({
+      systemPrompt: "Translate the following Spanish sentence to natural English. Only return the English translation.",
+      messages: [
+        { role: "user", content: aiResult.response }
+      ]
+    });
+
+    const englishTranslation = translationResult.response;
+
+    const fullResponse = aiResult.response;
+    let spanish = fullResponse;
+    let english = null;
+
+    if (fullResponse.includes("ENGLISH:")) {
+      const parts = fullResponse.split("ENGLISH:");
+      spanish = parts[0].trim();
+      english = parts[1].trim();
+    }
+
+    // Case 2: Parentheses format
+    else {
+      const match = fullResponse.match(/\(([^)]+)\)\s*$/);
+      if (match) {
+        english = match[1].trim();
+        spanish = fullResponse.replace(/\(([^)]+)\)\s*$/, "").trim();
+      }
+    }
+
+
     return res.status(200).json({
       assistantMessage: aiResult.response,
+      translation: englishTranslation,
       model: aiResult.model,
       usage: aiResult.usage,
       timestamp: new Date().toISOString(),

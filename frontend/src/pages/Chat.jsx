@@ -40,7 +40,12 @@ function Chat() {
       setMessages([
         ...messages,
         { role: "user", content: input },
-        { role: "assistant", content: data.assistantMessage }
+        {
+          role: "assistant",
+          content: data.assistantMessage,
+          translation: data.translation,
+          showTranslation: false
+        }
       ]);
 
       setInput("");
@@ -58,9 +63,31 @@ function Chat() {
       {/* Conversation Display */}
       <div style={{ marginBottom: 20 }}>
         {messages.map((msg, index) => (
-          <p key={index}>
+          <div key={index} style={{ marginBottom: 10 }}>
             <strong>{msg.role}:</strong> {msg.content}
-          </p>
+
+            {msg.role === "assistant" && msg.translation && (
+              <div>
+                {msg.showTranslation && (
+                  <p style={{ color: "#555", marginTop: 5 }}>
+                    💬 {msg.translation}
+                  </p>
+                )}
+
+                <button
+                  onClick={() => {
+                    const updated = [...messages];
+                    updated[index].showTranslation =
+                      !updated[index].showTranslation;
+                    setMessages(updated);
+                  }}
+                  style={{ marginTop: 5 }}
+                >
+                  {msg.showTranslation ? "Hide English" : "👁️ Show English"}
+                </button>
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
