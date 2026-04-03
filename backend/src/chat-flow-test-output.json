@@ -1,0 +1,146 @@
+{
+  "setup": {
+    "date": "2026-03-10T01:16:24.882Z",
+    "baseUrl": "http://127.0.0.1:62162",
+    "email": "chatflow_1773105384880@example.com"
+  },
+  "auth": {
+    "register": {
+      "status": 500,
+      "ok": false,
+      "body": {
+        "message": "Server error"
+      }
+    },
+    "login": {
+      "status": 500,
+      "ok": false,
+      "body": {
+        "message": "Server error"
+      }
+    },
+    "fallbackTokenUsed": true
+  },
+  "chat": {
+    "missingToken": {
+      "status": 401,
+      "ok": false,
+      "body": {
+        "message": "No token provided"
+      }
+    },
+    "invalidToken": {
+      "status": 401,
+      "ok": false,
+      "body": {
+        "message": "Unauthorized"
+      }
+    },
+    "emptyMessage": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "error": "CHAT_VALIDATION_ERROR",
+        "message": "Field \"message\" is required",
+        "timestamp": "2026-03-10T01:16:25.033Z"
+      }
+    },
+    "invalidHistory": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "error": "CHAT_VALIDATION_ERROR",
+        "message": "History item at index 0 must have role \"user\" or \"assistant\"",
+        "timestamp": "2026-03-10T01:16:25.038Z"
+      }
+    },
+    "successSingleTurn": {
+      "status": 200,
+      "ok": true,
+      "body": {
+        "assistantMessage": "¡Genial! La paella es una de nuestras especialidades. ¿Qué tipo de paella prefieres? Tenemos la valenciana, la de mariscos o la vegetariana. ¿Te gustaría que te explique las opciones?",
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "usage": {
+          "promptTokens": 2084,
+          "completionTokens": 46,
+          "totalTokens": 2130
+        },
+        "timestamp": "2026-03-10T01:16:26.675Z",
+        "promptVersion": "1.0.0"
+      }
+    }
+  },
+  "multiTurn": [
+    {
+      "id": "F1-order-modify",
+      "turn1": "Quiero una paella de mariscos.",
+      "turn2": "Mejor cambiala por una opcion vegetariana, por favor.",
+      "firstStatus": 200,
+      "secondStatus": 200,
+      "continuityHint": "veget",
+      "continuityPass": true,
+      "turn1Preview": "¡Genial! La paella de mariscos es una de nuestras especialidades. ¿Te gustaría que la preparemos con una variedad de mariscos frescos, como mejillones, calamare",
+      "turn2Preview": "No hay problema. En su lugar, puedo prepararte una paella vegetariana con verduras frescas y arroz. ¿Te gustaría que la haga con champiñones, pimientos y zanaho"
+    },
+    {
+      "id": "F2-food-then-drink",
+      "turn1": "Quiero unas tapas.",
+      "turn2": "Y para beber, que me recomiendas?",
+      "firstStatus": 200,
+      "secondStatus": 200,
+      "continuityHint": "beber",
+      "continuityPass": false,
+      "turn1Preview": "¡Genial! Tenemos muchas opciones de tapas deliciosas. ¿Te gustan las clásicas como patatas bravas, croquetas o tortilla española?",
+      "turn2Preview": "Nuestra bebida más popular es la sangría. Es una mezcla de vino, frutas y hierbas que es perfecta para acompañar las tapas. También tenemos cerveza, agua y refr"
+    },
+    {
+      "id": "F3-allergy-clarify",
+      "turn1": "Tengo alergia a los frutos secos, que me recomiendas?",
+      "turn2": "Entonces pido algo sin frutos secos y sin salsa de nuez.",
+      "firstStatus": 200,
+      "secondStatus": 200,
+      "continuityHint": "frutos secos",
+      "continuityPass": false,
+      "turn1Preview": "Tienes muchas opciones sin frutos secos. Nuestro plato del día es la paella valenciana, que no tiene frutos secos. También tenemos una deliciosa tortilla españo",
+      "turn2Preview": "Genial! Entiendo. Nuestra ensalada de atún es una buena opción, está hecha con atún fresco, tomate, cebolla y aceitunas. También tenemos una deliciosa sopa de v"
+    },
+    {
+      "id": "F4-billing-close",
+      "turn1": "Quiero una tortilla espanola y agua.",
+      "turn2": "Perfecto, ahora me trae la cuenta por favor.",
+      "firstStatus": 200,
+      "secondStatus": 200,
+      "continuityHint": "cuenta",
+      "continuityPass": true,
+      "turn1Preview": "Una tortilla española y agua, perfecto. ¿Quieres que te la haga con chorizo o sin?",
+      "turn2Preview": "Disculpa, pero todavía no te he traído la comida. ¿Quieres que te traiga primero la tortilla española y luego te traiga la cuenta?"
+    },
+    {
+      "id": "F5-offtopic-redirect",
+      "turn1": "Quiero una paella.",
+      "turn2": "Que opinas de la politica internacional?",
+      "firstStatus": 200,
+      "secondStatus": 200,
+      "continuityHint": "orden",
+      "continuityPass": true,
+      "turn1Preview": "¡Genial! La paella es una de nuestras especialidades. ¿Quieres la paella con mariscos, pollo, o vegetariana?",
+      "turn2Preview": "Soy solo un camarero, estoy aquí para ayudarte con la comida. ¿Qué te gustaría ordenar? ¿Quieres algo de beber mientras esperas tu paella?"
+    }
+  ],
+  "regression": {
+    "loginWrongPassword": {
+      "status": 500,
+      "ok": false,
+      "body": {
+        "message": "Server error"
+      }
+    },
+    "registerMissingFields": {
+      "status": 400,
+      "ok": false,
+      "body": {
+        "message": "Email and password required"
+      }
+    }
+  }
+}
