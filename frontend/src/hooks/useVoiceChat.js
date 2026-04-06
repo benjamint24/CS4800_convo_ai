@@ -89,7 +89,7 @@ export default function useVoiceChat() {
         }
       };
 
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.start(); // Collect data only when stopped to ensure valid WebM header
       setRecordingState('recording');
       startAudioMonitoring(stream);
 
