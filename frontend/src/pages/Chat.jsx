@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import VoiceOrb from "../components/VoiceOrb";
+import useVoiceChat from "../hooks/useVoiceChat";
+import "./Chat.css";
 
 function Chat() {
   const [scenarios, setScenarios] = useState([]);
@@ -7,39 +10,54 @@ function Chat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [voiceMode, setVoiceMode] = useState(true);
+  const [orbState, setOrbState] = useState("idle");
+  const messagesEndRef = useRef(null);
 
+  const {
+    audioLevel,
+    playbackLevel,
+    isRecording,
+    isTranscribing,
+    isPlaying,
+    isLoadingAudio,
+    startRecording,
+    stopRecording,
+    transcribeAudio,
+    playAudio,
+    stopPlayback,
+  } = useVoiceChat();
+
+  // Auto-scroll to latest message
   useEffect(() => {
-    fetchScenarios();
-  }, []);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  const fetchScenarios = async () => {
-    try {
-      const token = localStorage.getItem("convoai_token");
-      const res = await fetch("http://localhost:5050/api/scenarios", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setScenarios(data.scenarios || []);
-    } catch (err) {
-      console.error("Failed to fetch scenarios:", err);
-    }
+  // Sync orb state
+  useEffect(() => {
+    if (isRecording) setOrbState("listening");
+    else if (isTranscribing) setOrbState("transcribing");
+    else if (loading) setOrbState("thinking");
+    else if (isPlaying || isLoadingAudio) setOrbState("speaking");
+    else setOrbState("idle");
+  }, [isRecording, isTranscribing, loading, isPlaying, isLoadingAudio]);
+
+  // Get active audio level for the orb
+  const getActiveAudioLevel = () => {
+    if (isRecording) return audioLevel;
+    if (isPlaying) return playbackLevel;
+    return 0;
   };
 
-  const startScenario = (scenarioId) => {
-    setSelectedScenario(scenarioId);
-    setMessages([]);
-    setInput("");
-    setError("");
-  };
-
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  const sendMessage = async (messageText) => {
+    const text = messageText || input;
+    if (!text.trim()) return;
 
     setError("");
     setLoading(true);
 
     const token = localStorage.getItem("convoai_token");
-    const history = messages.slice(-8);
+    const history = messages.slice(-8).map(m => ({ role: m.role, content: m.content }));
 
     try {
       const res = await fetch("http://localhost:5050/api/chat", {
@@ -61,9 +79,9 @@ function Chat() {
         throw new Error(data.message || "Request failed");
       }
 
-      setMessages([
-        ...messages,
-        { role: "user", content: input },
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: text },
         {
           role: "assistant",
           content: data.assistantMessage,
@@ -80,131 +98,208 @@ function Chat() {
     setLoading(false);
   };
 
-  const getScenarioEmoji = (scenarioId) => {
-    const emojis = { restaurant: "🍽️", travel: "🗺️", smallTalk: "💬" };
-    return emojis[scenarioId] || "💬";
+  // Voice recording handlers
+  const handleOrbMouseDown = async () => {
+    if (!voiceMode) return;
+    if (orbState !== "idle") return;
+    try {
+      await startRecording();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
-  if (!selectedScenario) {
-    return (
-      <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>Choose a Scenario</h1>
-        <p style={{ color: "#666", marginBottom: "40px" }}>
-          Select a conversation scenario to start practicing Spanish
-        </p>
+  const handleOrbMouseUp = async () => {
+    if (!isRecording) return;
+    try {
+      const audioBlob = await stopRecording();
+      const transcription = await transcribeAudio(audioBlob);
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
-          {scenarios.map((scenario) => (
-            <div
-              key={scenario.id}
-              onClick={() => startScenario(scenario.id)}
-              style={{
-                border: "2px solid #e5e7eb",
-                borderRadius: "12px",
-                padding: "24px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-                background: "#fff",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#f97316";
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#e5e7eb";
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              <div style={{ fontSize: "48px", marginBottom: "12px" }}>
-                {getScenarioEmoji(scenario.id)}
-              </div>
-              <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
-                {scenario.title}
-              </h3>
-              <p style={{ color: "#666", fontSize: "14px" }}>{scenario.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+      if (transcription && transcription.trim()) {
+        setInput(transcription);
+        await sendMessage(transcription);
+      } else {
+        setError("Could not understand the audio. Please try again.");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-  const currentScenario = scenarios.find((s) => s.id === selectedScenario);
+  const handlePlayMessage = async (text) => {
+    try {
+      await playAudio(text);
+    } catch (err) {
+      setError("Failed to play audio: " + err.message);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const toggleTranslation = (index) => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        showTranslation: !updated[index].showTranslation,
+      };
+      return updated;
+    });
+  };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <div>
-          <h2 style={{ fontSize: "24px", marginBottom: "5px" }}>
-            {getScenarioEmoji(selectedScenario)} {currentScenario?.title}
-          </h2>
-          <p style={{ color: "#666", fontSize: "14px" }}>{currentScenario?.description}</p>
+    <div className="chat-page">
+      {/* Header */}
+      <header className="chat-header">
+        <div className="chat-header-left">
+          <div className="chat-logo">
+            <span className="chat-logo-icon">🗣️</span>
+            <h1>ConvoAI</h1>
+          </div>
+          <span className="chat-subtitle">Spanish Conversation Practice</span>
         </div>
-        <button
-          onClick={() => setSelectedScenario(null)}
-          style={{ padding: "8px 16px", border: "1px solid #ddd", borderRadius: "8px", background: "#fff", cursor: "pointer" }}
-        >
-          ← Change Scenario
-        </button>
-      </div>
+        <div className="chat-header-right">
+          <button
+            className={`voice-toggle ${voiceMode ? "voice-toggle--active" : ""}`}
+            onClick={() => setVoiceMode(!voiceMode)}
+            title={voiceMode ? "Switch to text mode" : "Switch to voice mode"}
+          >
+            <span className="voice-toggle-icon">{voiceMode ? "🎙️" : "⌨️"}</span>
+            <span className="voice-toggle-label">{voiceMode ? "Voice" : "Text"}</span>
+          </button>
+        </div>
+      </header>
 
-      <div style={{ marginBottom: 20, border: "1px solid #ddd", borderRadius: "12px", padding: "16px", minHeight: "400px", maxHeight: "500px", overflowY: "auto", background: "#f9fafb" }}>
-        {messages.length === 0 ? (
-          <p style={{ color: "#999", textAlign: "center", paddingTop: "100px" }}>
-            Start your conversation in Spanish! 👋
-          </p>
-        ) : (
-          messages.map((msg, index) => (
-            <div key={index} style={{ marginBottom: 12, display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
-              <div style={{ maxWidth: "70%", padding: "12px 16px", borderRadius: "12px", background: msg.role === "user" ? "#f97316" : "#fff", color: msg.role === "user" ? "#fff" : "#000", border: msg.role === "assistant" ? "1px solid #e5e7eb" : "none" }}>
-                <div>{msg.content}</div>
-
-                {msg.role === "assistant" && msg.translation && (
-                  <div style={{ marginTop: 8 }}>
-                    {msg.showTranslation && (
-                      <p style={{ fontSize: "14px", opacity: 0.8, marginTop: 4 }}>💬 {msg.translation}</p>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        const updated = [...messages];
-                        updated[index].showTranslation = !updated[index].showTranslation;
-                        setMessages(updated);
-                      }}
-                      style={{ marginTop: 6, fontSize: "12px", background: "transparent", border: "1px solid #ddd", padding: "4px 8px", borderRadius: "6px", cursor: "pointer" }}
-                    >
-                      {msg.showTranslation ? "Hide English" : "👁️ Show English"}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))
+      <div className="chat-body">
+        {/* Voice Orb Section */}
+        {voiceMode && (
+          <div className="chat-orb-section">
+            <VoiceOrb
+              state={orbState}
+              audioLevel={getActiveAudioLevel()}
+              onMouseDown={handleOrbMouseDown}
+              onMouseUp={handleOrbMouseUp}
+              onTouchStart={handleOrbMouseDown}
+              onTouchEnd={handleOrbMouseUp}
+            />
+            {orbState === "idle" && messages.length === 0 && (
+              <p className="chat-orb-hint">
+                Press and hold the orb to start speaking in Spanish
+              </p>
+            )}
+          </div>
         )}
+
+        {/* Messages Area */}
+        <div className="chat-messages-area">
+          {messages.length === 0 && (
+            <div className="chat-empty-state">
+              <div className="chat-empty-icon">💬</div>
+              <h3>Start a conversation</h3>
+              <p>
+                {voiceMode
+                  ? "Hold the orb above and speak in Spanish, or type below"
+                  : "Type a message in Spanish to begin practicing"}
+              </p>
+            </div>
+          )}
+
+          <div className="chat-messages">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`chat-bubble chat-bubble--${msg.role}`}
+              >
+                <div className="chat-bubble-avatar">
+                  {msg.role === "user" ? "👤" : "🤖"}
+                </div>
+                <div className="chat-bubble-body">
+                  <div className="chat-bubble-role">
+                    {msg.role === "user" ? "You" : "ConvoAI"}
+                  </div>
+                  <div className="chat-bubble-text">{msg.content}</div>
+
+                  {msg.role === "assistant" && (
+                    <div className="chat-bubble-actions">
+                      {/* Play audio button */}
+                      <button
+                        className="chat-action-btn chat-action-btn--speak"
+                        onClick={() => handlePlayMessage(msg.content)}
+                        disabled={isPlaying || isLoadingAudio}
+                        title="Listen to pronunciation"
+                      >
+                        {isLoadingAudio ? "⏳" : isPlaying ? "⏹️" : "🔊"}
+                      </button>
+
+                      {/* Translation toggle */}
+                      {msg.translation && (
+                        <button
+                          className="chat-action-btn chat-action-btn--translate"
+                          onClick={() => toggleTranslation(index)}
+                          title={msg.showTranslation ? "Hide translation" : "Show English translation"}
+                        >
+                          {msg.showTranslation ? "🙈" : "👁️"}{" "}
+                          {msg.showTranslation ? "Hide" : "English"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {msg.showTranslation && msg.translation && (
+                    <div className="chat-bubble-translation">
+                      <span className="translation-label">EN</span>
+                      {msg.translation}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Error display */}
+        {error && (
+          <div className="chat-error">
+            <span>⚠️</span> {error}
+            <button className="chat-error-dismiss" onClick={() => setError("")}>✕</button>
+          </div>
+        )}
+
+        {/* Input area */}
+        <div className="chat-input-area">
+          <div className="chat-input-wrapper">
+            <input
+              type="text"
+              className="chat-input"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Escribe un mensaje en español..."
+              disabled={loading || isRecording || isTranscribing}
+            />
+            <button
+              className="chat-send-btn"
+              onClick={() => sendMessage()}
+              disabled={loading || !input.trim() || isRecording}
+            >
+              {loading ? (
+                <span className="chat-send-spinner" />
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
-
-      <div style={{ display: "flex", gap: "10px" }}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="Escribe un mensaje en español..."
-          style={{ flex: 1, padding: "12px", border: "1px solid #ddd", borderRadius: "8px", fontSize: "16px" }}
-        />
-
-        <button
-          onClick={sendMessage}
-          disabled={loading}
-          style={{ padding: "12px 24px", background: "#f97316", color: "#fff", border: "none", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.6 : 1 }}
-        >
-          {loading ? "Sending..." : "Send"}
-        </button>
-      </div>
-
-      {error && <p style={{ color: "red", marginTop: 10 }}>Error: {error}</p>}
     </div>
   );
 }
