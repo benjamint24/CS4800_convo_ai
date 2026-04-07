@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth.routes");
 const chatRoutes = require("./routes/chat.routes");
 const voiceRoutes = require("./routes/voice.routes");
 
+const scenariosRoutes = require("./routes/scenarios.routes")
 
 // Middleware
 app.use(cors());
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/voice", voiceRoutes);
+app.use('/api/scenarios', scenariosRoutes)
 
 // Health check route
 app.get('/api/health', (req, res) => {

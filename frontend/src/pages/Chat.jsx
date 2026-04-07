@@ -4,6 +4,8 @@ import useVoiceChat from "../hooks/useVoiceChat";
 import "./Chat.css";
 
 function Chat() {
+  const [scenarios, setScenarios] = useState([]);
+  const [selectedScenario, setSelectedScenario] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -64,7 +66,11 @@ function Chat() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify({
+          message: input,
+          history: history,
+          scenarioId: selectedScenario,
+        }),
       });
 
       const data = await res.json();

@@ -125,7 +125,7 @@ function mapAiError(error) {
 
 exports.createConversationReply = async (req, res) => {
   try {
-    const { message, history = [], learnerLevel, region, tone } = req.body || {};
+    const { message, history = [], learnerLevel, region, tone, scenarioId = 'restaurant' } = req.body || {};
 
     const messageError = validateMessage(message);
     if (messageError) {
@@ -144,20 +144,16 @@ exports.createConversationReply = async (req, res) => {
 
     const normalizedMessage = message.trim();
 
-    let promptData;
-    try {
-      promptData = buildRestaurantPrompt({ learnerLevel, region, tone });
-    } catch (promptError) {
-      return sendError(
-        res,
-        400,
-        'CHAT_PROMPT_CONFIG_ERROR',
-        promptError.message
-      );
+    // Get the scenario from prompts.js
+    const scenarios = require('../scenarios/prompts');
+    const scenario = scenarios[scenarioId];
+    
+    if (!scenario) {
+      return sendError(res, 400, 'INVALID_SCENARIO', `Scenario "${scenarioId}" not found`);
     }
 
     const aiResult = await sendChatRequest({
-      systemPrompt: promptData.prompt,
+      systemPrompt: scenario.systemPrompt,
       messages: [
         ...normalizedHistory,
         { role: 'user', content: normalizedMessage }
@@ -200,7 +196,7 @@ exports.createConversationReply = async (req, res) => {
       model: aiResult.model,
       usage: aiResult.usage,
       timestamp: new Date().toISOString(),
-      promptVersion: promptData.version
+      //promptVersion: promptData.version
     });
   } catch (error) {
     console.error('[Chat Controller] createConversationReply failed:', error.message);
