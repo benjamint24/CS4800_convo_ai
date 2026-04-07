@@ -6,7 +6,10 @@ const app = express();
 const authRoutes = require("./routes/auth.routes");
 const chatRoutes = require("./routes/chat.routes");
 const voiceRoutes = require("./routes/voice.routes");
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 const scenariosRoutes = require("./routes/scenarios.routes")
 
 // Middleware
