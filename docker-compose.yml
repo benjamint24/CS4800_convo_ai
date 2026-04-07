@@ -1,21 +1,7 @@
 services:
   db:
-<<<<<<< Updated upstream
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: convoai_user
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: convoai_dev
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
-=======
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: convoai
       POSTGRES_USER: convoai
@@ -64,4 +50,3 @@ volumes:
   convoai_pgdata:
   backend_node_modules:
   frontend_node_modules:
->>>>>>> Stashed changes

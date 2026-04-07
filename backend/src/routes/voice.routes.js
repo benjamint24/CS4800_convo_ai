@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -20,23 +19,3 @@ router.post("/synthesize", authMiddleware, voiceController.synthesize);
 router.post("/transcribe", authMiddleware, upload.single("audio"), voiceController.transcribe);
 
 module.exports = router;
-=======
-const express = require('express');
-const multer = require('multer');
-const authMiddleware = require('../middleware/auth.middleware');
-const voiceController = require('../controllers/voice.controller');
-
-const router = express.Router();
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024,
-  },
-});
-
-router.post('/synthesize', authMiddleware, voiceController.synthesize);
-router.post('/transcribe', authMiddleware, upload.single('audio'), voiceController.transcribe);
-
-module.exports = router;
->>>>>>> Stashed changes
