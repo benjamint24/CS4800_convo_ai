@@ -116,12 +116,13 @@ export default function useVoiceChat() {
     });
   }, [stopAudioMonitoring]);
 
-  const transcribeAudio = useCallback(async (audioBlob) => {
+  const transcribeAudio = useCallback(async (audioBlob, language = "es") => {
     setRecordingState("transcribing");
 
     try {
       const formData = new FormData();
       formData.append("audio", audioBlob, "recording.webm");
+      formData.append("language", language);
 
       const response = await fetch(`${API_BASE}/transcribe`, {
         method: "POST",

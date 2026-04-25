@@ -59,7 +59,7 @@ async function synthesizeSpeech(text, voiceId) {
   }
 }
 
-async function transcribeSpeech(audioBuffer, filename = 'audio.webm') {
+async function transcribeSpeech(audioBuffer, filename = 'audio.webm', languageCode = elevenlabsConfig.stt.languageCode) {
   if (!elevenlabsConfig.apiKey) {
     throw new Error('ELEVENLABS_API_KEY is not configured');
   }
@@ -78,7 +78,7 @@ async function transcribeSpeech(audioBuffer, filename = 'audio.webm') {
     const blob = new Blob([audioBuffer], { type: 'audio/webm' });
     formData.append('file', blob, filename);
     formData.append('model_id', elevenlabsConfig.stt.model);
-    formData.append('language_code', elevenlabsConfig.stt.languageCode);
+    formData.append('language_code', languageCode);
 
     const response = await fetch(url, {
       method: 'POST',

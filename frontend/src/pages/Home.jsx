@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom"
-import { useAuth } from "../state/AuthContext"
+import useAuth from "../state/useAuth"
 
 export default function Home() {
-  const { user } = useAuth()  // FIXED: Added = sign
+  const { isAuthed } = useAuth()
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50">
@@ -12,19 +12,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto text-center">
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-            Practice Spanish with{" "}
+            Practice Languages with{" "}
             <span className="text-orange-500">AI Confidence</span>
           </h1>
 
           <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-4xl mx-auto mb-10">
-            Master real-world Spanish conversations in a judgment-free
+            Master real-world conversations in a judgment-free
             environment. Practice ordering at restaurants, asking for directions,
-            making small talk, and more with AI.
+            making small talk, and more with AI in Spanish, English, Chinese, Korean, and Japanese.
           </p>
 
           {/* CTA BUTTONS - CONDITIONAL BASED ON LOGIN STATUS */}
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-            {user ? (
+            {isAuthed ? (
               // LOGGED IN - Show "Go to Chat" button
               <Link
                 to="/chat"
@@ -91,7 +91,7 @@ export default function Home() {
               <div className="text-6xl mb-4">🤖</div>
               <h3 className="text-2xl font-bold mb-3">AI-Powered</h3>
               <p className="text-gray-600 leading-relaxed">
-                Powered by advanced AI that responds naturally in Spanish, just like a real conversation partner.
+                Powered by advanced AI that responds naturally in your selected practice language.
               </p>
             </div>
 
@@ -99,7 +99,7 @@ export default function Home() {
               <div className="text-6xl mb-4">💯</div>
               <h3 className="text-2xl font-bold mb-3">100% Free</h3>
               <p className="text-gray-600 leading-relaxed">
-                Completely free forever. No subscriptions, no hidden fees. Just unlimited Spanish practice.
+                Completely free forever. No subscriptions, no hidden fees. Just unlimited language practice.
               </p>
             </div>
 
@@ -118,7 +118,7 @@ export default function Home() {
               <div className="text-6xl mb-4">🍽️</div>
               <h4 className="text-2xl font-bold mb-3">Restaurant/Café</h4>
               <p className="text-gray-700 leading-relaxed">
-                Order food, ask for recommendations, interact with a waiter in Spanish.
+                Order food, ask for recommendations, and interact with a waiter in your chosen language.
               </p>
             </div>
 
@@ -126,7 +126,7 @@ export default function Home() {
               <div className="text-6xl mb-4">🗺️</div>
               <h4 className="text-2xl font-bold mb-3">Travel & Directions</h4>
               <p className="text-gray-700 leading-relaxed">
-                Navigate Barcelona, ask for directions, learn transportation vocabulary.
+                Navigate a city, ask for directions, and learn practical transportation vocabulary.
               </p>
             </div>
 
@@ -166,7 +166,7 @@ export default function Home() {
               <div className="bg-white bg-opacity-10 p-6 rounded-xl backdrop-blur-sm">
                 <h4 className="font-bold text-xl mb-3">✓ Real-World Scenarios</h4>
                 <p className="text-blue-50 leading-relaxed">
-                  Learn Spanish you'll actually use when traveling or living abroad.
+                  Build language skills you'll actually use when traveling or living abroad.
                 </p>
               </div>
               
@@ -184,16 +184,16 @@ export default function Home() {
       {/* FINAL CTA - FULL WIDTH */}
       <section className="w-full px-6 md:px-12 lg:px-20 py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to speak Spanish?</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to start speaking?</h2>
           <p className="text-xl md:text-2xl text-gray-600 mb-10">
-            {user ? "Continue your practice" : "Join learners practicing with ConvoAI today"}
+            {isAuthed ? "Continue your practice" : "Join learners practicing with ConvoAI today"}
           </p>
           
           <Link
-            to={user ? "/chat" : "/register"}
+            to={isAuthed ? "/chat" : "/register"}
             className="inline-block bg-orange-500 text-white px-12 py-5 rounded-xl text-xl font-semibold hover:bg-orange-600 shadow-lg hover:shadow-2xl transition-all transform hover:scale-105"
           >
-            {user ? "Go to Chat →" : "Start Your First Conversation →"}
+            {isAuthed ? "Go to Chat →" : "Start Your First Conversation →"}
           </Link>
         </div>
       </section>

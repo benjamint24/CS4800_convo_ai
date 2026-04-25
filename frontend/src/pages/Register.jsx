@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react"; // ADD useEffect
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../state/AuthContext"; // ADD THIS
+import useAuth from "../state/useAuth"; // ADD THIS
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const navigate = useNavigate();
-  const { user } = useAuth(); // ADD THIS
+  const { isAuthed } = useAuth();
 
-  // ADD THIS - Redirect if already logged in
   useEffect(() => {
-    if (user) {
+    if (isAuthed) {
       navigate('/chat');
     }
-  }, [user, navigate]);
+  }, [isAuthed, navigate]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -46,7 +45,7 @@ export default function Register() {
           Convo<span className="text-blue-900">AI</span>
         </h1>
         <p className="text-gray-600 text-center mt-2 mb-6">
-          Create an account to start practicing Spanish
+          Create an account to start practicing languages
         </p>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>

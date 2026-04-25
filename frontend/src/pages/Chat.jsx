@@ -1,23 +1,37 @@
 import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import VoiceOrb from "../components/VoiceOrb";
 import useVoiceChat from "../hooks/useVoiceChat";
+import useAuth from "../state/useAuth";
 import "./Chat.css";
+
+const LANGUAGE_OPTIONS = [
+  { value: "es", label: "Spanish" },
+  { value: "en", label: "English" },
+  { value: "zh", label: "Chinese" },
+  { value: "ko", label: "Korean" },
+  { value: "ja", label: "Japanese" },
+];
 
 const FALLBACK_SCENARIO = {
   id: "restaurant",
   title: "Restaurant Conversation",
-  description: "Practice ordering food and responding naturally in Spanish.",
+  description: "Practice ordering food and responding naturally in your selected language.",
 };
 
 function Chat() {
+  const navigate = useNavigate();
+  const { logout, email } = useAuth();
   const [scenarios, setScenarios] = useState([]);
   const [selectedScenario, setSelectedScenario] = useState("restaurant");
+  const [selectedLanguage, setSelectedLanguage] = useState(() => localStorage.getItem("convoai_language") || "es");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [voiceMode, setVoiceMode] = useState(true);
   const messagesEndRef = useRef(null);
+  const contextRef = useRef({ scenario: "restaurant", language: selectedLanguage });
 
   const {
     audioLevel,
@@ -30,10 +44,36 @@ function Chat() {
     stopRecording,
     transcribeAudio,
     playAudio,
+    stopPlayback,
   } = useVoiceChat();
 
   const currentScenario = scenarios.find((scenario) => scenario.id === selectedScenario) || FALLBACK_SCENARIO;
   const scenarioOptions = scenarios.length > 0 ? scenarios : [FALLBACK_SCENARIO];
+  const currentLanguageLabel =
+    LANGUAGE_OPTIONS.find((option) => option.value === selectedLanguage)?.label || "Spanish";
+
+  useEffect(() => {
+    localStorage.setItem("convoai_language", selectedLanguage);
+  }, [selectedLanguage]);
+
+  useEffect(() => {
+    const previous = contextRef.current;
+    const scenarioChanged = previous.scenario !== selectedScenario;
+    const languageChanged = previous.language !== selectedLanguage;
+
+    if (scenarioChanged || languageChanged) {
+      // Avoid mixing histories when practice context changes.
+      setMessages([]);
+      setInput("");
+      setError("");
+      stopPlayback();
+    }
+
+    contextRef.current = {
+      scenario: selectedScenario,
+      language: selectedLanguage,
+    };
+  }, [selectedScenario, selectedLanguage, stopPlayback]);
 
   useEffect(() => {
     const fetchScenarios = async () => {
@@ -52,8 +92,11 @@ function Chat() {
         const data = await response.json();
         setScenarios(data.scenarios || []);
 
-        if (data.scenarios?.length && !data.scenarios.some((scenario) => scenario.id === selectedScenario)) {
-          setSelectedScenario(data.scenarios[0].id);
+        if (data.scenarios?.length) {
+          setSelectedScenario((previousScenario) => {
+            const hasPrevious = data.scenarios.some((scenario) => scenario.id === previousScenario);
+            return hasPrevious ? previousScenario : data.scenarios[0].id;
+          });
         }
       } catch (fetchError) {
         console.error("Failed to fetch scenarios:", fetchError);
@@ -105,6 +148,7 @@ function Chat() {
           message: text,
           history,
           scenarioId: selectedScenario,
+          language: selectedLanguage,
         }),
       });
 
@@ -152,7 +196,7 @@ function Chat() {
 
     try {
       const audioBlob = await stopRecording();
-      const transcription = await transcribeAudio(audioBlob);
+      const transcription = await transcribeAudio(audioBlob, selectedLanguage);
 
       if (transcription && transcription.trim()) {
         setInput(transcription);
@@ -191,6 +235,12 @@ function Chat() {
     }
   };
 
+  const handleLogout = () => {
+    stopPlayback();
+    logout();
+    navigate("/");
+  };
+
   return (
     <div className="chat-page">
       <header className="chat-header">
@@ -206,12 +256,33 @@ function Chat() {
         </div>
 
         <div className="chat-header-right">
+          <div className="chat-user-actions">
+            <Link className="chat-user-link" to="/">
+              Home
+            </Link>
+            <button className="chat-logout-btn" onClick={handleLogout} type="button">
+              Logout
+            </button>
+            {email && <span className="chat-user-email">{email}</span>}
+          </div>
+
           <label className="chat-scenario-select">
             <span>Scenario</span>
             <select value={selectedScenario} onChange={(event) => setSelectedScenario(event.target.value)}>
               {scenarioOptions.map((scenario) => (
                 <option key={scenario.id} value={scenario.id}>
                   {scenario.title}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="chat-scenario-select">
+            <span>Language</span>
+            <select value={selectedLanguage} onChange={(event) => setSelectedLanguage(event.target.value)}>
+              {LANGUAGE_OPTIONS.map((language) => (
+                <option key={language.value} value={language.value}>
+                  {language.label}
                 </option>
               ))}
             </select>
@@ -241,7 +312,7 @@ function Chat() {
               onTouchEnd={handleOrbMouseUp}
             />
             {getOrbState() === "idle" && messages.length === 0 && (
-              <p className="chat-orb-hint">Press and hold the orb to start speaking in Spanish</p>
+              <p className="chat-orb-hint">Press and hold the orb to start speaking in {currentLanguageLabel}</p>
             )}
           </div>
         )}
@@ -251,7 +322,7 @@ function Chat() {
             <div className="chat-empty-state">
               <div className="chat-empty-icon">💬</div>
               <h3>Start a conversation</h3>
-              <p>{voiceMode ? "Hold the orb above or type below" : "Type a message in Spanish to begin practicing"}</p>
+              <p>{voiceMode ? "Hold the orb above or type below" : `Type a message in ${currentLanguageLabel} to begin practicing`}</p>
             </div>
           ) : (
             <div className="chat-messages">
@@ -319,7 +390,7 @@ function Chat() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Escribe un mensaje en español..."
+              placeholder={`Type a message in ${currentLanguageLabel}...`}
               disabled={loading || isRecording || isTranscribing}
             />
             <button className="chat-send-btn" onClick={() => sendMessage()} disabled={loading || !input.trim() || isRecording} type="button">

@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-
-const AuthContext = createContext(null);
+import { useEffect, useMemo, useState } from "react";
+import AuthContext from "./auth-context";
 
 const LS_TOKEN = "convoai_token";
 const LS_EMAIL = "convoai_email";
@@ -35,10 +34,4 @@ export function AuthProvider({ children }) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within <AuthProvider />");
-  return ctx;
 }
