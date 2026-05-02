@@ -1,96 +1,167 @@
-🚀 ConvoAI Sprint 2 Demo Runbook
-1️⃣ Prerequisites (Before Class)
+# 🚀 ConvoAI Demo Runbook (Windows & Mac)
 
-Make sure:
+Follow these step-by-step instructions to get the complete ConvoAI application (Database, Backend, and Frontend) running locally.
 
-Docker Desktop is running
+<<<<<<< Updated upstream
+## 1️⃣ Prerequisites
 
-PostgreSQL is running locally
+Make sure you have the following installed and running on your machine:
+- **Docker Desktop** (Needs to be running)
+- **Node.js** (v18 or v20 recommended)
+=======
+- Docker Desktop is installed and running
+- PostgreSQL is available locally, or the app is pointed at a reachable database host
+- backend/.env contains:
+>>>>>>> Stashed changes
 
-backend/.env contains:
-
+Make sure your `backend/.env` file exists and has the correct keys:
+```env
 PORT=5050
+<<<<<<< Updated upstream
+DATABASE_URL="postgresql://convoai_user:password123@localhost:5432/convoai_dev"
+
+# Make sure you have your secrets here
+JWT_SECRET="<your-secret>"
+HUGGINGFACE_API_KEY="<your-hf-key>"
+ELEVENLABS_API_KEY="<your-elevenlabs-key>"
+```
+
+---
+
+## 2️⃣ Start Database (Docker)
+
+We have a `docker-compose.yml` file that handles standing up the PostgreSQL database with the exact correct user and database names.
+
+Open a terminal at the **root** of the project:
+```bash
+docker compose up -d
+```
+
+*This starts PostgreSQL in the background. You can verify it is running inside the Docker Desktop app.*
+
+---
+
+## 3️⃣ Start Backend Server
+
+Open a new terminal and navigate to the `backend` folder:
+```bash
+cd backend
+```
+
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Sync the Database Schema:**
+   *(This tells Prisma to create the required tables in our new Postgres database)*
+   ```bash
+   npx prisma db push
+   ```
+   *Note: If you run into issues, you may also need to run `npx prisma generate` to generate the Prisma client.*
+
+3. **Start the Server:**
+   ```bash
+   npm run dev
+   ```
+=======
 DATABASE_URL=postgresql://YOUR_USERNAME@host.docker.internal:5432/convoai
 JWT_SECRET=supersecret
 HUGGINGFACE_API_KEY=your_real_key_here
-2️⃣ Start PostgreSQL (Local)
 
-In terminal:
+If you are using Docker Desktop on Windows, make sure file sharing is enabled for the workspace drive.
 
-brew services start postgresql
+2️⃣ Database
 
-Verify:
+If PostgreSQL is already running locally, confirm it is reachable from Docker at host.docker.internal:5432.
 
-psql -d convoai
-\q
+If not, start it with your usual local setup before launching the app containers.
 
-If that works → database is ready.
+3️⃣ Start Everything with Docker Compose
 
-3️⃣ Start Backend (Docker)
+From the project root in PowerShell:
 
-From project root:
+docker compose up --build
 
-docker run --rm -it \
-  -p 5050:5050 \
-  --env-file backend/.env \
-  -v "$PWD":/app \
-  -w /app/backend \
-  node:20 bash
+This starts:
 
-Inside container:
+- PostgreSQL on port 5432
+- Backend on http://localhost:5050
+- Frontend on http://localhost:5173
+>>>>>>> Stashed changes
 
-npm install
-npx prisma generate
-npm run dev
+You should see an output indicating:
+✅ `Server running on http://localhost:5050`
 
-You should see:
+<<<<<<< Updated upstream
+*(Leave this terminal window running)*
 
-Server running on http://localhost:5050
+---
 
-Leave this terminal running.
+## 4️⃣ Start Frontend Server
 
-4️⃣ Start Frontend (Docker)
+Open another new terminal and navigate to the `frontend` folder from the project root:
+```bash
+cd frontend
+```
 
-Open a new terminal window.
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-From project root:
+2. **Start the React/Vite Application:**
+   ```bash
+   npm run dev
+   ```
+=======
+To stop everything:
 
-docker run --rm -it \
-  -p 5173:5173 \
-  -v "$PWD":/app \
-  -w /app/frontend \
-  node:20 bash
+docker compose down
 
-Inside container:
+4️⃣ Open the App
+>>>>>>> Stashed changes
 
-npm install
-npm run dev -- --host
+You should see an output with the local frontend URL, typically:
+✅ `http://localhost:5173`
 
-Open browser:
+*(Leave this terminal window running)*
 
-http://localhost:5173
-5️⃣ Live Demo Flow (In Browser)
-A. Register (optional if user exists)
+---
 
-Go to:
+## 5️⃣ Live Demo Flow
 
-http://localhost:5173/register
+Now that all three pieces (DB, Backend, Frontend) are running, you can walk through the demo flow!
 
-Create new account:
+### Step A: Register
+1. Open your browser to `http://localhost:5173/register`
+2. Create an account:
+   - Email: `demo@test.com`
+   - Password: `password123`
 
-Email: demo@test.com
-Password: 123456
-B. Login
+### Step B: Login
+1. It should automatically log you in, or go to the Login page.
+2. Login with the credentials you just created.
 
-Go to login page.
+### Step C: Test the AI Voice Chat
+1. Navigate to the chat interface.
+2. Type or speak a prompt in Spanish (e.g., "Hola, quiero pedir comida.").
+3. The AI should respond back with a generated response in Spanish, complete with the ElevenLabs generated audio!
 
-Use:
+---
 
-Email: demo@test.com
-Password: 123456
+## 🛑 How to Stop Everything
 
-You should be redirected.
-
+<<<<<<< Updated upstream
+When you are done with the demo:
+1. **Frontend:** Press `Ctrl + C` in the frontend terminal.
+2. **Backend:** Press `Ctrl + C` in the backend terminal.
+3. **Database:** At the project root terminal, run: 
+   ```bash
+   docker compose down
+   ```
+   *(This stops and safely removes the database container)*
+=======
 C. Verify JWT Stored
 
 Open DevTools:
@@ -181,3 +252,13 @@ Stop backend container:
 
 Ctrl + C
 exit
+
+10️⃣ Quick Docker Check
+
+If Docker is not recognized, install Docker Desktop from https://www.docker.com/products/docker-desktop/ and reopen the terminal.
+
+You can verify the setup with:
+
+docker --version
+docker ps
+>>>>>>> Stashed changes

@@ -1,15 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../state/AuthContext";
+import useAuth from "../../state/useAuth";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { isAuthed, email, logout } = useAuth();
-
+  
   return (
     <header className="border-b border-gray-200 bg-white">
-
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-
         <div className="flex items-center gap-6">
           <Link
             to="/"
@@ -17,17 +15,24 @@ export default function Navbar() {
           >
             Convo<span className="text-blue-900">AI</span>
           </Link>
-
           <Link
             to="/"
             className="text-gray-600 hover:text-black"
           >
             Home
           </Link>
+          {/* ADD CHAT LINK WHEN LOGGED IN */}
+          {isAuthed && (
+            <Link
+              to="/chat"
+              className="text-gray-600 hover:text-black"
+            >
+              Chat
+            </Link>
+          )}
         </div>
-
+        
         <div className="flex items-center gap-4">
-
           {!isAuthed ? (
             <>
               <Link
@@ -36,7 +41,6 @@ export default function Navbar() {
               >
                 Login
               </Link>
-
               <Link
                 to="/register"
                 className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition"
@@ -49,7 +53,6 @@ export default function Navbar() {
               <span className="text-sm text-gray-600">
                 {email}
               </span>
-
               <button
                 className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300"
                 onClick={() => {
@@ -61,10 +64,8 @@ export default function Navbar() {
               </button>
             </>
           )}
-
         </div>
       </div>
-
     </header>
   );
 }

@@ -1,5 +1,8 @@
-const { buildRestaurantPrompt } = require('../scenarios/promptBuilder');
 const { sendChatRequest } = require('../services/ai.service');
+const {
+  getLanguagePromptStrategy,
+  getSupportedLanguages
+} = require('../scenarios/factories/languagePromptStrategyFactory');
 const {
   AIValidationError,
   AIProviderError,
@@ -10,6 +13,7 @@ const {
 
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_HISTORY_ENTRIES = 10;
+const SUPPORTED_LANGUAGES = getSupportedLanguages();
 
 function sendError(res, status, error, message, details) {
   return res.status(status).json({
@@ -125,7 +129,15 @@ function mapAiError(error) {
 
 exports.createConversationReply = async (req, res) => {
   try {
-    const { message, history = [], learnerLevel, region, tone } = req.body || {};
+    const {
+      message,
+      history = [],
+      learnerLevel,
+      region,
+      tone,
+      scenarioId = 'restaurant',
+      language = 'es'
+    } = req.body || {};
 
     const messageError = validateMessage(message);
     if (messageError) {
@@ -144,63 +156,59 @@ exports.createConversationReply = async (req, res) => {
 
     const normalizedMessage = message.trim();
 
-    let promptData;
-    try {
-      promptData = buildRestaurantPrompt({ learnerLevel, region, tone });
-    } catch (promptError) {
+    // Get the scenario from prompts.js
+    const scenarios = require('../scenarios/prompts');
+    const scenario = scenarios[scenarioId];
+    
+    if (!scenario) {
+      return sendError(res, 400, 'INVALID_SCENARIO', `Scenario "${scenarioId}" not found`);
+    }
+
+    if (!SUPPORTED_LANGUAGES.includes(language)) {
       return sendError(
         res,
         400,
-        'CHAT_PROMPT_CONFIG_ERROR',
-        promptError.message
+        'INVALID_LANGUAGE',
+        `Language "${language}" is not supported. Use one of: ${SUPPORTED_LANGUAGES.join(', ')}`
       );
     }
 
+    const languageStrategy = getLanguagePromptStrategy(language);
+    const selectedSystemPrompt = languageStrategy.buildPrompt(scenario);
+    const writingSystem = languageStrategy.getWritingSystem();
+
     const aiResult = await sendChatRequest({
-      systemPrompt: promptData.prompt,
+      systemPrompt: selectedSystemPrompt,
       messages: [
         ...normalizedHistory,
         { role: 'user', content: normalizedMessage }
       ]
     });
 
-    // Generate English translation separately
-    const translationResult = await sendChatRequest({
-      systemPrompt: "Translate the following Spanish sentence to natural English. Only return the English translation.",
-      messages: [
-        { role: "user", content: aiResult.response }
-      ]
-    });
+    let englishTranslation = null;
 
-    const englishTranslation = translationResult.response;
+    // Keep translation helper for non-English practice languages.
+    if (language !== 'en') {
+      const translationResult = await sendChatRequest({
+        systemPrompt: `Translate the following ${languageStrategy.getTranslationSourceName()} sentence to natural English. Only return the English translation.`,
+        messages: [
+          { role: 'user', content: aiResult.response }
+        ]
+      });
 
-    const fullResponse = aiResult.response;
-    let spanish = fullResponse;
-    let english = null;
-
-    if (fullResponse.includes("ENGLISH:")) {
-      const parts = fullResponse.split("ENGLISH:");
-      spanish = parts[0].trim();
-      english = parts[1].trim();
-    }
-
-    // Case 2: Parentheses format
-    else {
-      const match = fullResponse.match(/\(([^)]+)\)\s*$/);
-      if (match) {
-        english = match[1].trim();
-        spanish = fullResponse.replace(/\(([^)]+)\)\s*$/, "").trim();
-      }
+      englishTranslation = translationResult.response;
     }
 
 
     return res.status(200).json({
       assistantMessage: aiResult.response,
       translation: englishTranslation,
+      language,
+      writingSystem,
       model: aiResult.model,
       usage: aiResult.usage,
       timestamp: new Date().toISOString(),
-      promptVersion: promptData.version
+      //promptVersion: promptData.version
     });
   } catch (error) {
     console.error('[Chat Controller] createConversationReply failed:', error.message);

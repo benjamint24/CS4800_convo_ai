@@ -2,7 +2,7 @@
 
 This backend can be run using:
 
-1. Docker (Recommended – consistent environment)
+1. Docker Compose (recommended for full stack)
 2. Local Node (if environment is stable)
 
 --------------------------------------------------
@@ -13,25 +13,21 @@ PREREQUISITES
 - Docker Desktop (for Docker setup)
 
 --------------------------------------------------
-OPTION A — DOCKER (RECOMMENDED)
+OPTION A — DOCKER COMPOSE (RECOMMENDED)
 
-From project root:
+From the project root:
 
-docker run --rm -it \
-  -p 5050:5050 \
-  --env-file backend/.env \
-  -v "$PWD":/app \
-  -w /app/backend \
-  node:20 bash
+docker compose up --build
 
-Inside container:
+This starts:
 
-npm install
-npx prisma generate
-npm run dev
+- PostgreSQL on port 5432
+- Backend on http://localhost:5050
+- Frontend on http://localhost:5173
 
-Backend runs at:
-http://localhost:5050
+To stop everything:
+
+docker compose down
 
 --------------------------------------------------
 OPTION B — LOCAL NODE

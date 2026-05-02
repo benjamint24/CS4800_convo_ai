@@ -1,20 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react"; // ADD useEffect
 import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../state/useAuth"; // ADD THIS
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
-
   const navigate = useNavigate();
+  const { isAuthed } = useAuth();
+
+  useEffect(() => {
+    if (isAuthed) {
+      navigate('/chat');
+    }
+  }, [isAuthed, navigate]);
 
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
-
     if (!email.includes("@")) return setErr("Enter a valid email.");
     if (password.length < 6) return setErr("Password must be at least 6 characters.");
-
     try {
       const res = await fetch("http://localhost:5050/api/auth/register", {
         method: "POST",
@@ -23,15 +28,11 @@ export default function Register() {
         },
         body: JSON.stringify({ email, password })
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.message || "Registration failed");
       }
-
       navigate("/login");
-
     } catch (error) {
       setErr(error.message);
     }
@@ -39,19 +40,14 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4">
-
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-
         <h1 className="text-3xl font-bold text-center text-orange-500">
           Convo<span className="text-blue-900">AI</span>
         </h1>
-
         <p className="text-gray-600 text-center mt-2 mb-6">
-          Create an account to start practicing Spanish
+          Create an account to start practicing languages
         </p>
-
         <form onSubmit={onSubmit} className="space-y-4">
-
           <div>
             <label className="block font-semibold mb-1">Email</label>
             <input
@@ -61,7 +57,6 @@ export default function Register() {
               placeholder="you@example.com"
             />
           </div>
-
           <div>
             <label className="block font-semibold mb-1">Password</label>
             <input
@@ -72,29 +67,23 @@ export default function Register() {
               placeholder="At least 6 characters"
             />
           </div>
-
           {err && (
             <p className="text-red-500 text-sm">{err}</p>
           )}
-
           <button
             type="submit"
             className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition"
           >
             Create Account
           </button>
-
         </form>
-
         <p className="text-center text-gray-600 mt-4">
           Already have an account?{" "}
           <Link className="text-orange-500 font-semibold hover:underline" to="/login">
             Login
           </Link>
         </p>
-
       </div>
-
     </div>
   );
 }
